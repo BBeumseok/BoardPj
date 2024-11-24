@@ -1,0 +1,369 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <script src="//t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js"></script>
+    <style>
+        /* 기존 스타일에 추가할 인증 관련 스타일 */
+        .auth-container {
+            max-width: 500px;
+            margin: 40px auto;
+            padding: 30px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            background-color: #fff;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .auth-title {
+            text-align: center;
+            margin-bottom: 30px;
+            color: #333;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: #333;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+
+        .form-group input:focus {
+            border-color: #007bff;
+            outline: none;
+            box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.25);
+        }
+
+        .id-check-group {
+            display: flex;
+            gap: 10px;
+        }
+
+        .id-check-group input {
+            flex: 1;
+        }
+
+        .id-check-btn {
+            padding: 10px 15px;
+            background-color: #6c757d;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        .id-check-btn:hover {
+            background-color: #5a6268;
+        }
+
+        .checkbox-group {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 20px;
+        }
+
+        .checkbox-group input[type="checkbox"] {
+            width: auto;
+        }
+
+        .address-group {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 10px;
+        }
+
+        .address-group input {
+            flex: 1;
+        }
+
+        .error-message {
+            padding: 10px;
+            margin-bottom: 20px;
+            color: #dc3545;
+            background-color: #f8d7da;
+            border: 1px solid #f5c6cb;
+            border-radius: 4px;
+        }
+
+        .success-message {
+            padding: 10px;
+            margin-bottom: 20px;
+            color: #28a745;
+            background-color: #d4edda;
+            border: 1px solid #c3e6cb;
+            border-radius: 4px;
+        }
+
+        .auth-links {
+            text-align: center;
+            margin-top: 20px;
+        }
+
+        .auth-links a {
+            color: #6c757d;
+            text-decoration: none;
+            font-size: 14px;
+        }
+
+        .auth-links a:hover {
+            color: #007bff;
+        }
+
+        .submit-btn {
+            width: 100%;
+            padding: 12px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 500;
+        }
+
+        .submit-btn:hover {
+            background-color: #0056b3;
+        }
+    </style>
+    <title>Member Join Page</title>
+</head>
+    <body>
+        <div class="container auth-container">
+            <h2 class="auth-container">회원가입 페이지</h2>
+
+            <div class="auth-links">
+                <a th:href="@{/board/list}">목록</a>
+            </div>
+
+            <form th:action="@{/member/join}" method="post">
+
+                <div class="error-message" th:if="${error}" th:text="${error}"></div>
+
+                <!-- 아이디 -->
+                <div class="form-group">
+                    <label for="userId">아이디</label>
+                    <input type="text" id="userId" name="userId" th:value="${userDTO.userId}">
+                    <button class="id-check-btn" type="button" onclick="checkDuplicate()">중복확인</button>
+                </div>
+
+                <!-- 비밀번호 -->
+                <div class="form-group">
+                    <label for="userPw">비밀번호</label>
+                    <input type="password" id="userPw" name="userPw" th:value="${userDTO.userPw}" oninput="checkPasswordMatch()">
+                </div>
+                <!-- 비밀번호 확인 -->
+                <div class="form-group">
+                    <label for="checkPw">비밀번호 확인</label>
+                    <input type="password" id="checkPw" oninput="checkPasswordMatch()">
+                    <span id="passwordMatchMessage"></span>
+                </div>
+
+                <!-- 회원 이름 -->
+                <div class="form-group">
+                    <label for="userName">회원이름</label>
+                    <input type="text" id="userName" name="userName" th:value="${userDTO.userName}">
+                </div>
+
+                <!-- 핸드폰 번호 -->
+                <div class="form-group">
+                    <label>핸드폰 번호</label>
+                    <div>
+                        <select name="userPhone1" th:value="${userDTO.userPhone1}">
+                            <option value="">==== 선택 ====</option>
+                            <option th:each="phone: ${phone}"
+                                    th:value="${phone.codeName}"
+                                    th:text="${phone.codeName}"></option>
+                        </select>
+                        <input type="text" id="phone2" name="userPhone2" th:value="${userDTO.userPhone2}" maxlength="4">
+                        <input type="text" id="phone3" name="userPhone3" th:value="${userDTO.userPhone3}" maxlength="4">
+                    </div>
+                </div>
+
+                <!-- 우편번호 -->
+                <div class="form-group">
+                    <label for="userAddr1">우편번호</label>
+                    <input type="text" id="userAddr1" name="userAddr1" th:value="${userDTO.userAddr1}">
+                    <input type="button" onclick="PostCode()" value="우편번호 찾기">
+                </div>
+
+                <!-- 상세주소 -->
+                <div class="form-group">
+                    <label for="userAddr2">상세주소</label>
+                    <input type="text" id="userAddr2" name="userAddr2" th:value="${userDTO.userAddr2}" placeholder="상세 주소를 입력해주세요">
+                </div>
+
+                <!-- 회사 주소 -->
+                <div class="form-group">
+                    <label for="userCompany">회사주소</label>
+                    <input type="text" id="userCompany" name="userCompany" th:value="${userDTO.userCompany}" placeholder="회사 주소를 입력하세요">
+                </div>
+
+                <button type="submit">회원 등록</button>
+            </form>
+        </div>
+    </body>
+
+<script>
+    let idChecked = false;
+
+    function validate() {
+        const userId = document.getElementById('userId').value;
+        const userPw = document.getElementById('userPw').value;
+        const checkPw = document.getElementById('checkPw').value;
+        const userName = document.getElementById('userName').value;
+        const phone2 = document.getElementById('phone2').value;
+        const phone3 = document.getElementById('phone3').value;
+
+        if(!userId || !userPw || !checkPw || !userName || !phone2 || !phone3) {
+            alert('필수 정보를 모두 입력해주세요');
+            return false;
+        }
+
+        if(!idChecked) {
+            alert('아이디 중복확인을 해주세요');
+            return false;
+        }
+
+        if(userPw !== checkPw) {
+            alert('비밀번호가 일치하지 않습니다');
+            return false;
+        }
+
+        if(!validatePassword(userPw)) {
+            alert('최소 8자리 이상, 영문자/숫자/특수문자를 포함해야 합니다');
+            return false;
+        }
+
+        if (phone2 && phone3) {
+            if (!/^\d{3,4}$/.test(phone2) || !/^\d{4}$/.test(phone3)) {
+                alert('형식이 올바르지 않습니다');
+                return false;
+            }
+        }
+
+        return false;
+    }
+
+    //  ===============================================================================================
+    /* 아이디 중복체크 스크립트 */
+
+    function checkDuplicate() {
+        const userId = document.getElementById('userId').value;
+
+        if (!userId) {
+            alert('아이디를 입력하세요');
+            return;
+        }
+
+        fetch(`/member/check-id?userId=${userId}`)
+            .then(response => response.json())
+            .then(data => {
+                if (data.available) {
+                    alert('사용 가능한 아이디 입니다');
+                    idChecked = true;
+                } else {
+                    alert('이미 사용중인 아이디 입니다.');
+                    idChecked = false;
+                }
+            });
+    }
+
+    //  ===============================================================================================
+    /* 비밀번호 이벤트 추가 */
+    document.getElementById('userPw').addEventListener('input', function () {
+        const password = this.value;
+        const message = document.getElementById('passwordMatchMessage');
+
+        if (password) {
+            if(validatePassword(password)) {
+                message.textContent = '사용 가능한 비밀번호 입니다.';
+                message.style.cssText = 'color: green; font-size: 0.8em; margin-left: 5px;';
+
+            } else {
+                message.textContent = '비밀번호는 8자 이상, 영문자/숫자/특수문자를 모두 포함해야 합니다.';
+                message.style.cssText = 'color: red; font-size: 0.8em; margin-left: 5px;';
+            }
+        } else {
+            message.textContent = '';
+        }
+    });
+
+    /* 비밀번호 확인 */
+    function checkPasswordMatch() {
+        const password = document.getElementById('userPw').value;
+        const confirm = document.getElementById('checkPw').value;
+        const message = document.getElementById('passwordMatchMessage');
+
+        const styleMatch = 'color: green; font-size: 0.8em; margin-left: 5px;';
+        const styleMismatch = 'color: red; font-size: 0.8em; margin-left: 5px;';
+
+        if (password || confirm) {
+            if(!validatePassword(password)) {
+                message.textContent = '비밀번호는 8자리 이상, 영문자/숫자/특수문자를 모두 포함해야 합니다.';
+                message.style.cssText = styleMismatch;
+                return;
+            }
+
+            if(password === confirm) {
+                message.textContent = '비밀번호가 일치합니다.';
+                message.style.cssText = styleMatch;
+
+            } else {
+                message.textContent = '비밀번호가 일치하지 않습니다.';
+                message.style.cssText = styleMismatch;
+            }
+
+        } else {
+            message.textContent = '';
+        }
+    }
+
+    // 비밀번호 유효성 검사
+    function validatePassword(password) {
+        // 최소 8자, 영문자, 숫자, 특수문자 포함
+        const regex = /^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*#?&])[A-Za-z\d@$!%*#?&]{8,}$/;
+        return regex.test(password);
+    }
+
+    //  ===============================================================================================
+    /* 카카오 우편번호 API */
+    function PostCode() {
+        new daum.Postcode({
+            oncomplete: function (data) {
+                //  팝업에서 검색결과 항목을 클릭했을때 실행할 코드를 작성하는 부분
+
+                //  각 주소의 노출 규칙에 따라 주소를 조합한다.
+                //  내려오는 변수가 값이 없는 경우엔 공백('')값을 가지므로, 이를 참고하여 분기한다.
+                var addr = '';          //  주소 변수
+                // var extraAddr = '';     //  참고항목 변수
+                //  사용자가 선택한 주소 타입에 따라 해당 주소 값을 가져온다.
+                if (data.userSelectedType === 'R') {    //  사용자가 도로명 주소를 선택한 경우
+                    addr = data.roadAddress;
+                } else {    //  사용자가 지번 주소를 선택한 경우(J)
+                    addr = data.jibunAddress;
+                }
+
+                //  우편번호와 주소 정보를 해당 필드에 넣는다.
+                document.getElementById('userAddr1').value = data.zonecode;
+                document.getElementById('userAddr2').value = addr;
+
+                //  커서를 상세주소 필드로 이동한다.
+                document.getElementById('userAddr2').focus();
+            }
+        }).open();
+    }
+</script>
+</html>

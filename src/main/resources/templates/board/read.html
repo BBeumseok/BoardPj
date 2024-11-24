@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <style>
+        /* Common styles */
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        /* Header styles */
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #eee;
+        }
+
+        .header a {
+            color: #333;
+            text-decoration: none;
+            margin-left: 15px;
+        }
+
+        /* Board list styles */
+        .board-list {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+        }
+
+        .board-list th {
+            background-color: #f8f9fa;
+            padding: 12px;
+            border-top: 2px solid #333;
+            border-bottom: 1px solid #ddd;
+            text-align: left;
+        }
+
+        .board-list td {
+            padding: 12px;
+            border-bottom: 1px solid #ddd;
+        }
+
+        .board-list a {
+            color: #333;
+            text-decoration: none;
+        }
+
+        .board-list a:hover {
+            text-decoration: underline;
+        }
+
+        /* Pagination styles */
+        .pagination {
+            display: flex;
+            justify-content: center;
+            margin: 30px 0;
+            gap: 10px;
+        }
+
+        .pagination a {
+            padding: 8px 12px;
+            border: 1px solid #ddd;
+            color: #333;
+            text-decoration: none;
+            border-radius: 4px;
+        }
+
+        .pagination a:hover {
+            background-color: #f8f9fa;
+        }
+
+        /* Button styles */
+        .button-group {
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+            margin: 20px 0;
+        }
+
+        .btn {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 4px;
+            background-color: #007bff;
+            color: white;
+            text-decoration: none;
+            cursor: pointer;
+        }
+
+        .btn:hover {
+            background-color: #0056b3;
+        }
+
+        .register-btn {
+            background-color: #28a745;
+            color: white;
+            padding: 8px 16px;
+            border-radius: 4px;
+            text-decoration: none;
+        }
+
+        .register-btn:hover {
+            background-color: #218838;
+        }
+
+        /* View group styles */
+        .view-group {
+            margin-bottom: 20px;
+        }
+
+        .view-group .label {
+            font-weight: bold;
+            margin-bottom: 8px;
+            display: block;
+        }
+
+        .view-group .content {
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            background-color: #fff;
+            min-height: 40px;
+        }
+
+        /* Form styles */
+        form {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        input[type="text"],
+        textarea {
+            width: 100%;
+            padding: 8px;
+            margin-bottom: 16px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+
+        textarea {
+            min-height: 200px;
+            resize: vertical;
+        }
+
+        select {
+            width: 100%;
+            padding: 8px;
+            margin-bottom: 16px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+
+        /* Board type styles */
+        .board-type {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .board-type a {
+            padding: 6px 12px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            color: #333;
+            text-decoration: none;
+        }
+
+        .board-type a.active {
+            background-color: #007bff;
+            color: white;
+            border-color: #007bff;
+        }
+
+        /* List button */
+        .list-btn {
+            padding: 8px 16px;
+            background-color: #6c757d;
+            color: white;
+            text-decoration: none;
+            border-radius: 4px;
+        }
+
+        .list-btn:hover {
+            background-color: #5a6268;
+        }
+    </style>
+    <title>Board Read Page</title>
+</head>
+    <body>
+        <div class="container">
+            <div class="view-group">
+                <span class="label">제목</span>
+                <div class="content" th:text="${boardDTO.boardTitle}"></div>
+            </div>
+
+            <div class="view-group">
+                <span class="label">내용</span>
+                <div class="content" th:text="${boardDTO.boardComment}"></div>
+            </div>
+
+            <div class="view-group">
+                <span class="label">작성자</span>
+                <div class="content" th:text="${boardDTO.creator}"></div>
+            </div>
+
+            <div class="button-group">
+                <a th:href="@{/board/list}">
+                    <button type="button" class="btn">목록</button>
+                </a>
+                <a th:href="@{'/board/update/' + ${boardDTO.boardType} + '/' + ${boardDTO.boardNum}}">
+                    <button type="button" class="btn">수정</button>
+                </a>
+            </div>
+        </div>
+    </body>
+</html>
